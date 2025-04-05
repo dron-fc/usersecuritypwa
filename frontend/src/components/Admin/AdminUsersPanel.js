@@ -195,4 +195,16 @@ const AdminUsersPanel = () => {
   );
 };
 
+try {
+  const data = await client('users', {
+    headers: { Authorization: `Bearer ${auth.token}` }
+  });
+  setUsers(data);
+} catch (error) {
+  if (error.status === 403) {
+    navigate('/unauthorized');
+  }
+  // ... остальная обработка
+}
+
 export default AdminUsersPanel;

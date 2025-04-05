@@ -3,7 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import Login from './components/Auth/Login';
 import Register from './components/Auth/Register';
 import AdminPanel from './components/Admin/AdminPanel';
-import AdminUsersPanel from './components/Admin/AdminUsersPanel'; // Добавлен этот импорт
+import AdminUsersPanel from './components/Admin/AdminUsersPanel';
 import UserDashboard from './components/User/UserDashboard';
 import ModeratorPanel from './components/Moderator/ModeratorPanel';
 import NotFound from './components/Common/NotFound';

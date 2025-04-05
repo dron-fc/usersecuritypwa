@@ -51,20 +51,21 @@ export const AuthProvider = ({ children }) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
     });
-  
+
     const data = await response.json();
-    
+
     // Важно! Проверяем что приходит с сервера
-    console.log("Login response:", data); 
-  
+    console.log("Login response:", data);
+
+    localStorage.setItem('role', data.role);
     setAuth({
       isAuthenticated: true,
       user: data.user,
-      role: data.user.role,  // Убедитесь что роль приходит
+      role: data.role,
       token: data.token
     });
   };
-  
+
   // Функция регистрации
   const register = async (email, password, role = 'user') => {
     try {
