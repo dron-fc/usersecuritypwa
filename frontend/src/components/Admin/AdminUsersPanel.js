@@ -1,42 +1,53 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { 
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper,
   Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField,
   MenuItem, IconButton, Snackbar, Alert
 } from '@mui/material';
-import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon } from '@mui/icons-material';
+import { 
+  Edit as EditIcon, 
+  Delete as DeleteIcon,
+  Add as AddIcon 
+} from '@mui/icons-material';
 import { client } from '../../api/client';
 
 const AdminUsersPanel = () => {
-  const { auth } = useAuth();
-  const [users, setUsers] = useState([]);
+  const { auth } = useAuth(); // Добавлен хук useAuth
+  const navigate = useNavigate(); // Добавлен хук useNavigate
+  const [users, setUsers] = useState([]); // Добавлен setUsers
   const [openDialog, setOpenDialog] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
-
-  // Форма
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     role: 'user'
   });
 
-  // Используем useCallback для стабильной ссылки на функцию
-  const fetchUsers = useCallback(async () => {
+  const fetchUsers = async () => {
     try {
-      const data = await client('users', { 
-        headers: { Authorization: `Bearer ${auth.token}` } 
+      const data = await client('users', {
+        headers: { Authorization: `Bearer ${auth.token}` }
       });
       setUsers(data);
     } catch (error) {
-      showSnackbar('Failed to fetch users', 'error');
+      if (error.status === 403) {
+        navigate('/unauthorized');
+      } else {
+        setSnackbar({
+          open: true,
+          message: 'Failed to fetch users',
+          severity: 'error'
+        });
+      }
     }
-  }, [auth.token]);
+  };
 
   useEffect(() => {
     fetchUsers();
-  }, [fetchUsers]); // Добавляем fetchUsers в зависимости
+  }, []);
 
   // Обработчики
   const handleInputChange = (e) => {
@@ -181,7 +192,6 @@ const AdminUsersPanel = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Уведомления */}
       <Snackbar
         open={snackbar.open}
         autoHideDuration={6000}
@@ -194,17 +204,5 @@ const AdminUsersPanel = () => {
     </div>
   );
 };
-
-try {
-  const data = await client('users', {
-    headers: { Authorization: `Bearer ${auth.token}` }
-  });
-  setUsers(data);
-} catch (error) {
-  if (error.status === 403) {
-    navigate('/unauthorized');
-  }
-  // ... остальная обработка
-}
 
 export default AdminUsersPanel;
